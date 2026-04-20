@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>eventbooze — Plan the moment. Own the night.</title>
+  <meta name="description" content="We're building something that changes how events are planned, booked and experienced." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      background: radial-gradient(ellipse at center, #0d3028 0%, #071a14 60%, #040e0b 100%);
+      color: #e8f5f0;
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Corner cross decorations */
+    .cross {
+      position: fixed;
+      width: 20px;
+      height: 20px;
+      opacity: 0.35;
+    }
+    .cross::before, .cross::after {
+      content: '';
+      position: absolute;
+      background: #4db88a;
+    }
+    .cross::before { width: 1px; height: 100%; left: 50%; transform: translateX(-50%); }
+    .cross::after  { height: 1px; width: 100%; top: 50%; transform: translateY(-50%); }
+    .cross.tl { top: 32px; left: 40px; }
+    .cross.tr { top: 32px; right: 40px; }
+    .cross.bl { bottom: 32px; left: 40px; }
+    .cross.br { bottom: 32px; right: 40px; }
+
+    main {
+      text-align: center;
+      padding: 40px 24px;
+      max-width: 700px;
+      width: 100%;
+    }
+
+    /* Logo */
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 56px;
+    }
+    .logo-icon {
+      width: 56px;
+      height: 56px;
+      background: linear-gradient(135deg, #3ecf8e, #1a9e68);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 22px;
+      color: #fff;
+      letter-spacing: -1px;
+      box-shadow: 0 4px 20px rgba(62, 207, 142, 0.3);
+    }
+    .logo-text { text-align: left; }
+    .logo-name {
+      font-size: 28px;
+      font-weight: 400;
+      color: #fff;
+      letter-spacing: -0.5px;
+    }
+    .logo-name strong { font-weight: 700; }
+    .logo-tagline {
+      font-size: 13px;
+      color: #7ab99a;
+      font-style: italic;
+      margin-top: 2px;
+    }
+
+    /* Divider label */
+    .label {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      justify-content: center;
+      margin-bottom: 32px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 3px;
+      color: #4db88a;
+      text-transform: uppercase;
+    }
+    .label::before, .label::after {
+      content: '';
+      flex: 1;
+      max-width: 60px;
+      height: 1px;
+      background: #4db88a;
+      opacity: 0.6;
+    }
+
+    /* Headline */
+    h1 {
+      font-family: 'Inter', sans-serif;
+      font-size: clamp(44px, 9vw, 80px);
+      font-weight: 800;
+      line-height: 1.05;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+    h1 em {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      color: #3ecf8e;
+      font-weight: 700;
+    }
+
+    /* Sub copy */
+    .sub {
+      margin: 36px auto 48px;
+      max-width: 480px;
+      font-size: 16px;
+      line-height: 1.7;
+      color: #9ecfb8;
+    }
+    .sub strong { color: #e8f5f0; font-weight: 600; }
+
+    /* Follow label */
+    .follow-label {
+      margin-bottom: 28px;
+    }
+
+    /* Social + contact links */
+    .links {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 13px 26px;
+      border-radius: 50px;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+    }
+    .btn:hover { transform: translateY(-2px); }
+
+    .btn-instagram {
+      background: linear-gradient(135deg, #833ab4, #fd1d1d, #f77737);
+      color: #fff;
+      box-shadow: 0 4px 18px rgba(253, 29, 29, 0.3);
+    }
+    .btn-instagram:hover { box-shadow: 0 6px 24px rgba(253, 29, 29, 0.45); }
+
+    .btn-email {
+      background: rgba(62, 207, 142, 0.12);
+      color: #3ecf8e;
+      border: 1px solid rgba(62, 207, 142, 0.35);
+    }
+    .btn-email:hover {
+      background: rgba(62, 207, 142, 0.2);
+      box-shadow: 0 4px 16px rgba(62, 207, 142, 0.2);
+    }
+
+    svg.icon { width: 18px; height: 18px; fill: currentColor; flex-shrink: 0; }
+
+    /* Footer */
+    footer {
+      position: fixed;
+      bottom: 20px;
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      color: #4a7a62;
+      text-transform: lowercase;
+    }
+
+    @media (max-width: 480px) {
+      .cross.tl, .cross.tr { top: 20px; }
+      .cross.tl, .cross.bl { left: 20px; }
+      .cross.tr, .cross.br { right: 20px; }
+      .cross.bl, .cross.br { bottom: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="cross tl"></div>
+  <div class="cross tr"></div>
+  <div class="cross bl"></div>
+  <div class="cross br"></div>
+
+  <main>
+    <div class="logo">
+      <div class="logo-icon">eb</div>
+      <div class="logo-text">
+        <div class="logo-name">event<strong>booze</strong></div>
+        <div class="logo-tagline">Plan the moment. Own the night.</div>
+      </div>
+    </div>
+
+    <div class="label">Something big is coming</div>
+
+    <h1>Events will<br>never feel<br><em>the same.</em></h1>
+
+    <p class="sub">
+      We're building something that changes how <strong>events are planned,<br>booked and experienced.</strong>
+    </p>
+
+    <div class="label follow-label">Follow to be the first to know</div>
+
+    <div class="links">
+      <a class="btn btn-instagram" href="https://www.instagram.com/eventbooze" target="_blank" rel="noopener noreferrer">
+        <svg class="icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2.163c3.204 0 3.584.012 4.85.07 1.366.062 2.633.334 3.608 1.308.975.975 1.246 2.242 1.308 3.608.058 1.266.07 1.646.07 4.85s-.012 3.584-.07 4.85c-.062 1.366-.334 2.633-1.308 3.608-.975.975-2.242 1.246-3.608 1.308-1.266.058-1.646.07-4.85.07s-3.584-.012-4.85-.07c-1.366-.062-2.633-.334-3.608-1.308-.975-.975-1.246-2.242-1.308-3.608C2.175 15.584 2.163 15.204 2.163 12s.012-3.584.07-4.85c.062-1.366.334-2.633 1.308-3.608.975-.975 2.242-1.246 3.608-1.308C8.416 2.175 8.796 2.163 12 2.163zm0-2.163C8.741 0 8.332.013 7.052.072 5.197.157 3.355.673 2.014 2.014.673 3.355.157 5.197.072 7.052.013 8.332 0 8.741 0 12c0 3.259.013 3.668.072 4.948.085 1.855.601 3.697 1.942 5.038 1.341 1.341 3.183 1.857 5.038 1.942C8.332 23.987 8.741 24 12 24s3.668-.013 4.948-.072c1.855-.085 3.697-.601 5.038-1.942 1.341-1.341 1.857-3.183 1.942-5.038.059-1.28.072-1.689.072-4.948 0-3.259-.013-3.668-.072-4.948-.085-1.855-.601-3.697-1.942-5.038C20.645.673 18.803.157 16.948.072 15.668.013 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zm0 10.162a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/>
+        </svg>
+        @eventbooze
+      </a>
+
+      <a class="btn btn-email" href="mailto:admin@eventbooze.com">
+        <svg class="icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/>
+        </svg>
+        admin@eventbooze.com
+      </a>
+    </div>
+  </main>
+
+  <footer>www.eventbooze.in</footer>
+
+</body>
+</html>
