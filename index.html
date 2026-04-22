@@ -12,6 +12,10 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
       min-height: 100vh;
       background: radial-gradient(ellipse at center, #0d3028 0%, #071a14 60%, #040e0b 100%);
@@ -22,7 +26,8 @@
       align-items: center;
       justify-content: center;
       position: relative;
-      overflow: hidden;
+      overflow-x: hidden;
+      overflow-y: auto;
     }
 
     /* Corner cross decorations */
@@ -232,11 +237,20 @@
     }
 
     @media (max-width: 480px) {
+      body {
+        justify-content: flex-start;
+      }
+      main {
+        padding: 48px 20px 60px;
+      }
       .cross.tl, .cross.tr { top: 20px; }
       .cross.tl, .cross.bl { left: 20px; }
       .cross.tr, .cross.br { right: 20px; }
       .cross.bl, .cross.br { bottom: 20px; }
       .ticker-pill { min-width: 220px; padding: 11px 24px; }
+      .logo { margin-bottom: 40px; }
+      .sub { margin: 24px auto 0; }
+      .ticker-block { margin: 28px auto 28px; }
     }
   </style>
 </head>
