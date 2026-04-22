@@ -30,6 +30,7 @@
       width: 20px;
       height: 20px;
       opacity: 0.35;
+      z-index: 1;
     }
     .cross::before, .cross::after {
       content: '';
@@ -45,45 +46,42 @@
 
     main {
       text-align: center;
-      padding: 40px 24px;
+      padding: 40px 24px 80px;
       max-width: 700px;
       width: 100%;
+      position: relative;
+      z-index: 1;
     }
 
     /* Logo */
     .logo {
       display: inline-flex;
       align-items: center;
-      gap: 14px;
+      gap: 18px;
       margin-bottom: 56px;
     }
     .logo-icon {
-      width: 56px;
-      height: 56px;
-      background: linear-gradient(135deg, #3ecf8e, #1a9e68);
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 22px;
-      color: #fff;
-      letter-spacing: -1px;
-      box-shadow: 0 4px 20px rgba(62, 207, 142, 0.3);
+      width: 64px;
+      height: 64px;
+      flex-shrink: 0;
+      filter: drop-shadow(0 4px 16px rgba(62, 207, 142, 0.3));
     }
     .logo-text { text-align: left; }
     .logo-name {
-      font-size: 28px;
-      font-weight: 400;
-      color: #fff;
+      font-family: 'Playfair Display', serif;
+      font-size: 34px;
+      font-weight: 700;
       letter-spacing: -0.5px;
+      line-height: 1;
     }
-    .logo-name strong { font-weight: 700; }
+    .logo-name .word-event { color: #e8f5f0; }
+    .logo-name .word-booze { color: #3ecf8e; }
     .logo-tagline {
+      font-family: 'Playfair Display', serif;
       font-size: 13px;
       color: #7ab99a;
       font-style: italic;
-      margin-top: 2px;
+      margin-top: 5px;
     }
 
     /* Divider label */
@@ -126,18 +124,48 @@
 
     /* Sub copy */
     .sub {
-      margin: 36px auto 48px;
-      max-width: 480px;
-      font-size: 16px;
-      line-height: 1.7;
-      color: #9ecfb8;
+      margin: 36px auto 0;
+      max-width: 460px;
+      font-size: 13px;
+      font-weight: 300;
+      line-height: 1.8;
+      color: #7aab94;
+      letter-spacing: 0.2px;
     }
-    .sub strong { color: #e8f5f0; font-weight: 600; }
+    .sub strong { color: #b0d9c8; font-weight: 400; }
+
+    /* Perfect for — ticker block */
+    .ticker-block {
+      margin: 40px auto 40px;
+    }
+    .ticker-block .label {
+      margin-bottom: 18px;
+    }
+    .ticker-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 13px 36px;
+      border-radius: 50px;
+      border: 1px solid rgba(62, 207, 142, 0.28);
+      background: rgba(62, 207, 142, 0.06);
+      box-shadow: 0 0 28px rgba(62, 207, 142, 0.07), inset 0 1px 0 rgba(255,255,255,0.04);
+      min-width: 260px;
+    }
+    .ticker-text {
+      font-size: 17px;
+      font-weight: 600;
+      color: #e8f5f0;
+      letter-spacing: 0.2px;
+      text-align: center;
+      opacity: 1;
+      transition: opacity 0.35s ease;
+      min-height: 26px;
+    }
+    .ticker-text.fade { opacity: 0; }
 
     /* Follow label */
-    .follow-label {
-      margin-bottom: 28px;
-    }
+    .follow-label { margin-bottom: 28px; }
 
     /* Social + contact links */
     .links {
@@ -180,14 +208,26 @@
 
     svg.icon { width: 18px; height: 18px; fill: currentColor; flex-shrink: 0; }
 
+    /* Starry canvas background */
+    #stars-canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
     /* Footer */
     footer {
       position: fixed;
       bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
       font-size: 11px;
       letter-spacing: 1.5px;
       color: #4a7a62;
       text-transform: lowercase;
+      z-index: 10;
+      white-space: nowrap;
     }
 
     @media (max-width: 480px) {
@@ -195,10 +235,13 @@
       .cross.tl, .cross.bl { left: 20px; }
       .cross.tr, .cross.br { right: 20px; }
       .cross.bl, .cross.br { bottom: 20px; }
+      .ticker-pill { min-width: 220px; padding: 11px 24px; }
     }
   </style>
 </head>
 <body>
+
+  <canvas id="stars-canvas"></canvas>
 
   <div class="cross tl"></div>
   <div class="cross tr"></div>
@@ -207,9 +250,58 @@
 
   <main>
     <div class="logo">
-      <div class="logo-icon">eb</div>
+      <!-- eventbooze logo: dark circle, rounded-rect with bright header + dot-border body -->
+      <svg class="logo-icon" width="64" height="64" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <clipPath id="eb-clip">
+            <rect x="10" y="13" width="80" height="74" rx="11"/>
+          </clipPath>
+        </defs>
+        <!-- Outer dark green circle -->
+        <circle cx="50" cy="50" r="48" fill="#0c2c1d"/>
+        <g clip-path="url(#eb-clip)">
+          <!-- Body: medium green -->
+          <rect x="10" y="13" width="80" height="74" fill="#29a96c"/>
+          <!-- Top header strip: bright green -->
+          <rect x="10" y="13" width="80" height="20" fill="#3ecf8e"/>
+          <!-- Dot frame around the body area (below the header) -->
+          <!-- Top row of body dots (y=41) -->
+          <circle cx="16" cy="41" r="3.4" fill="rgba(225,255,238,0.72)"/>
+          <circle cx="25" cy="41" r="3.4" fill="rgba(225,255,238,0.72)"/>
+          <circle cx="34" cy="41" r="3.4" fill="rgba(225,255,238,0.72)"/>
+          <circle cx="43" cy="41" r="3.4" fill="rgba(225,255,238,0.72)"/>
+          <circle cx="52" cy="41" r="3.4" fill="rgba(225,255,238,0.72)"/>
+          <circle cx="61" cy="41" r="3.4" fill="rgba(225,255,238,0.72)"/>
+          <circle cx="70" cy="41" r="3.4" fill="rgba(225,255,238,0.72)"/>
+          <circle cx="79" cy="41" r="3.4" fill="rgba(225,255,238,0.72)"/>
+          <circle cx="88" cy="41" r="3.4" fill="rgba(225,255,238,0.72)"/>
+          <!-- Left column (x=16): between top and bottom dot rows -->
+          <circle cx="16" cy="52" r="3.4" fill="rgba(225,255,238,0.72)"/>
+          <circle cx="16" cy="63" r="3.4" fill="rgba(225,255,238,0.72)"/>
+          <circle cx="16" cy="74" r="3.4" fill="rgba(225,255,238,0.72)"/>
+          <!-- Right column (x=88) -->
+          <circle cx="88" cy="52" r="3.4" fill="rgba(225,255,238,0.72)"/>
+          <circle cx="88" cy="63" r="3.4" fill="rgba(225,255,238,0.72)"/>
+          <circle cx="88" cy="74" r="3.4" fill="rgba(225,255,238,0.72)"/>
+          <!-- Bottom row (y=85) -->
+          <circle cx="16" cy="85" r="3.4" fill="rgba(225,255,238,0.72)"/>
+          <circle cx="25" cy="85" r="3.4" fill="rgba(225,255,238,0.72)"/>
+          <circle cx="34" cy="85" r="3.4" fill="rgba(225,255,238,0.72)"/>
+          <circle cx="43" cy="85" r="3.4" fill="rgba(225,255,238,0.72)"/>
+          <circle cx="52" cy="85" r="3.4" fill="rgba(225,255,238,0.72)"/>
+          <circle cx="61" cy="85" r="3.4" fill="rgba(225,255,238,0.72)"/>
+          <circle cx="70" cy="85" r="3.4" fill="rgba(225,255,238,0.72)"/>
+          <circle cx="79" cy="85" r="3.4" fill="rgba(225,255,238,0.72)"/>
+          <circle cx="88" cy="85" r="3.4" fill="rgba(225,255,238,0.72)"/>
+        </g>
+        <!-- "eb" centered in the clear body area -->
+        <text x="52" y="65" font-family="Playfair Display, Georgia, serif" font-size="26" font-weight="700" text-anchor="middle" dominant-baseline="middle">
+          <tspan fill="#0c2c1d">e</tspan><tspan fill="#ffffff">b</tspan>
+        </text>
+      </svg>
+
       <div class="logo-text">
-        <div class="logo-name">event<strong>booze</strong></div>
+        <div class="logo-name"><span class="word-event">event</span><span class="word-booze">booze</span></div>
         <div class="logo-tagline">Plan the moment. Own the night.</div>
       </div>
     </div>
@@ -221,6 +313,14 @@
     <p class="sub">
       We're building something that changes how <strong>events are planned,<br>booked and experienced.</strong>
     </p>
+
+    <!-- Ticker: moved here, above follow label -->
+    <div class="ticker-block">
+      <div class="label">Perfect for</div>
+      <div class="ticker-pill">
+        <span class="ticker-text" id="ticker-text">Birthday parties 🎂</span>
+      </div>
+    </div>
 
     <div class="label follow-label">Follow to be the first to know</div>
 
@@ -242,6 +342,112 @@
   </main>
 
   <footer>www.eventbooze.in</footer>
+
+  <script>
+    /* ── Cascading radial stars from centre ── */
+    (function () {
+      const canvas = document.getElementById('stars-canvas');
+      const ctx = canvas.getContext('2d');
+      let W, H, cx, cy;
+      const particles = [];
+      const POOL = 120;
+
+      function resize() {
+        W = canvas.width  = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+        cx = W / 2;
+        cy = H / 2;
+      }
+
+      function spawn() {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = 0.3 + Math.random() * 0.9;
+        return {
+          x: cx, y: cy,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          r: 0.5 + Math.random() * 1.0,
+          maxAge: 180 + Math.random() * 220,
+          frame: 0,
+          brightness: 0.35 + Math.random() * 0.35,
+        };
+      }
+
+      for (let i = 0; i < POOL; i++) {
+        const p = spawn();
+        p.frame = Math.random() * p.maxAge;
+        p.x = cx + p.vx * p.frame;
+        p.y = cy + p.vy * p.frame;
+        particles.push(p);
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, W, H);
+        for (const p of particles) {
+          p.frame++;
+          p.x += p.vx;
+          p.y += p.vy;
+
+          if (p.frame >= p.maxAge) {
+            Object.assign(p, spawn());
+            continue;
+          }
+
+          const t = p.frame / p.maxAge;
+          let a;
+          if (t < 0.25)      a = t / 0.25;
+          else if (t < 0.65) a = 1;
+          else               a = 1 - (t - 0.65) / 0.35;
+
+          a *= p.brightness;
+
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(210, 255, 235, ${a})`;
+          ctx.fill();
+        }
+        requestAnimationFrame(draw);
+      }
+
+      window.addEventListener('resize', resize);
+      resize();
+      requestAnimationFrame(draw);
+    })();
+
+    /* ── Event type ticker ── */
+    (function () {
+      const events = [
+        'Birthday parties 🎂',
+        'Anniversaries ❤️',
+        'House parties 🍻',
+        'Get-togethers 👥',
+        'Farewell parties 👋',
+        'Reunion (school/college) 🎓',
+        'Baby showers 👶',
+        'Naming ceremonies 👶',
+        'Engagement ceremonies 💍',
+        'Weddings 💒',
+        'Reception 💐',
+        'Mehendi / Haldi 🌿',
+        'Sangeet 🎶',
+        'Bachelor / Bachelorette parties 🥂',
+        'Proposal events 💖',
+      ];
+      const el = document.getElementById('ticker-text');
+      let idx = 0;
+
+      function next() {
+        el.classList.add('fade');
+        setTimeout(() => {
+          idx = (idx + 1) % events.length;
+          el.textContent = events[idx];
+          el.classList.remove('fade');
+        }, 350);
+      }
+
+      setInterval(next, 2200);
+    })();
+  </script>
 
 </body>
 </html>
