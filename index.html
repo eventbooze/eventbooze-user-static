@@ -30,26 +30,6 @@
       overflow-y: auto;
     }
 
-    /* Corner cross decorations */
-    .cross {
-      position: fixed;
-      width: 20px;
-      height: 20px;
-      opacity: 0.35;
-      z-index: 1;
-    }
-    .cross::before, .cross::after {
-      content: '';
-      position: absolute;
-      background: #4db88a;
-    }
-    .cross::before { width: 1px; height: 100%; left: 50%; transform: translateX(-50%); }
-    .cross::after  { height: 1px; width: 100%; top: 50%; transform: translateY(-50%); }
-    .cross.tl { top: 32px; left: 40px; }
-    .cross.tr { top: 32px; right: 40px; }
-    .cross.bl { bottom: 32px; left: 40px; }
-    .cross.br { bottom: 32px; right: 40px; }
-
     main {
       text-align: center;
       padding: 40px 24px 80px;
@@ -147,28 +127,32 @@
     .ticker-block .label {
       margin-bottom: 18px;
     }
-    .ticker-pill {
-      display: inline-flex;
+    .ticker-slot {
+      position: relative;
+      overflow: hidden;
+      height: 36px;
+      display: flex;
       align-items: center;
       justify-content: center;
-      padding: 13px 36px;
-      border-radius: 50px;
-      border: 1px solid rgba(62, 207, 142, 0.28);
-      background: rgba(62, 207, 142, 0.06);
-      box-shadow: 0 0 28px rgba(62, 207, 142, 0.07), inset 0 1px 0 rgba(255,255,255,0.04);
-      min-width: 260px;
     }
     .ticker-text {
-      font-size: 17px;
+      font-size: 19px;
       font-weight: 600;
       color: #e8f5f0;
       letter-spacing: 0.2px;
       text-align: center;
-      opacity: 1;
-      transition: opacity 0.35s ease;
-      min-height: 26px;
+      display: block;
+      transition: transform 0.42s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.42s ease;
     }
-    .ticker-text.fade { opacity: 0; }
+    .ticker-text.exit {
+      transform: translateY(-120%);
+      opacity: 0;
+    }
+    .ticker-text.enter {
+      transform: translateY(120%);
+      opacity: 0;
+      transition: none;
+    }
 
     /* Follow label */
     .follow-label { margin-bottom: 28px; }
@@ -241,11 +225,8 @@
       main {
         padding: 48px 20px 60px;
       }
-      .cross.tl, .cross.tr { top: 20px; }
-      .cross.tl, .cross.bl { left: 20px; }
-      .cross.tr, .cross.br { right: 20px; }
-      .cross.bl, .cross.br { bottom: 20px; }
-      .ticker-pill { min-width: 220px; padding: 11px 24px; }
+      .ticker-slot { height: 32px; }
+      .ticker-text { font-size: 16px; }
       .logo { margin-bottom: 40px; }
       .sub { margin: 24px auto 0; }
       .ticker-block { margin: 28px auto 28px; }
@@ -255,11 +236,6 @@
 <body>
 
   <canvas id="stars-canvas"></canvas>
-
-  <div class="cross tl"></div>
-  <div class="cross tr"></div>
-  <div class="cross bl"></div>
-  <div class="cross br"></div>
 
   <main>
     <div class="logo">
@@ -308,7 +284,7 @@
     <!-- Ticker: moved here, above follow label -->
     <div class="ticker-block">
       <div class="label">Perfect for</div>
-      <div class="ticker-pill">
+      <div class="ticker-slot">
         <span class="ticker-text" id="ticker-text">Birthday parties 🎂</span>
       </div>
     </div>
@@ -338,13 +314,13 @@
 
 
   <script>
-    /* ── Cascading radial stars from centre ── */
+    /* ── Glitter burst from centre ── */
     (function () {
       const canvas = document.getElementById('stars-canvas');
-      const ctx = canvas.getContext('2d');
+      const ctx    = canvas.getContext('2d');
       let W, H, cx, cy;
       const particles = [];
-      const POOL = 120;
+      const POOL = 140;
 
       function resize() {
         W = canvas.width  = window.innerWidth;
@@ -354,16 +330,22 @@
       }
 
       function spawn() {
-        const angle = Math.random() * Math.PI * 2;
-        const speed = 0.3 + Math.random() * 0.9;
+        const angle  = Math.random() * Math.PI * 2;
+        const speed  = 0.4 + Math.random() * 1.1;
+        const isSpark = Math.random() < 0.38;
+        const green   = Math.random() < 0.25;
         return {
           x: cx, y: cy,
           vx: Math.cos(angle) * speed,
           vy: Math.sin(angle) * speed,
-          r: 0.5 + Math.random() * 1.0,
-          maxAge: 180 + Math.random() * 220,
+          size: isSpark ? 0.5 + Math.random() * 0.9 : 0.2 + Math.random() * 0.5,
+          isSpark,
+          green,
+          maxAge: 160 + Math.random() * 240,
           frame: 0,
-          brightness: 0.35 + Math.random() * 0.35,
+          peak: 0.18 + Math.random() * 0.22,
+          spin: (Math.random() - 0.5) * 0.08,
+          angle: Math.random() * Math.PI,
         };
       }
 
@@ -375,12 +357,43 @@
         particles.push(p);
       }
 
+      function drawSpark(x, y, sz, a, angle, green) {
+        const arm   = sz * 4.5;
+        const waist = sz * 0.28;
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(angle);
+        ctx.shadowColor = green ? '#3ecf8e' : '#c8ffe0';
+        ctx.shadowBlur  = sz * 8;
+        ctx.fillStyle   = green ? `rgba(62,207,142,${a})` : `rgba(220,255,240,${a})`;
+        ctx.beginPath();
+        ctx.moveTo(0,    -arm);
+        ctx.quadraticCurveTo( waist, -waist,  arm, 0);
+        ctx.quadraticCurveTo( waist,  waist,  0,   arm);
+        ctx.quadraticCurveTo(-waist,  waist, -arm, 0);
+        ctx.quadraticCurveTo(-waist, -waist,  0,  -arm);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      function drawDot(x, y, sz, a, green) {
+        ctx.save();
+        ctx.shadowColor = green ? '#3ecf8e' : '#b0ffd8';
+        ctx.shadowBlur  = sz * 4;
+        ctx.beginPath();
+        ctx.arc(x, y, sz, 0, Math.PI * 2);
+        ctx.fillStyle = green ? `rgba(62,207,142,${a})` : `rgba(210,255,235,${a})`;
+        ctx.fill();
+        ctx.restore();
+      }
+
       function draw() {
         ctx.clearRect(0, 0, W, H);
         for (const p of particles) {
           p.frame++;
           p.x += p.vx;
           p.y += p.vy;
+          p.angle += p.spin;
 
           if (p.frame >= p.maxAge) {
             Object.assign(p, spawn());
@@ -389,16 +402,13 @@
 
           const t = p.frame / p.maxAge;
           let a;
-          if (t < 0.25)      a = t / 0.25;
-          else if (t < 0.65) a = 1;
-          else               a = 1 - (t - 0.65) / 0.35;
+          if      (t < 0.15) a = t / 0.15;
+          else if (t < 0.6)  a = 1;
+          else               a = 1 - (t - 0.6) / 0.4;
+          a *= p.peak;
 
-          a *= p.brightness;
-
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(210, 255, 235, ${a})`;
-          ctx.fill();
+          if (p.isSpark) drawSpark(p.x, p.y, p.size, a, p.angle, p.green);
+          else           drawDot(p.x, p.y, p.size, a, p.green);
         }
         requestAnimationFrame(draw);
       }
@@ -431,12 +441,14 @@
       let idx = 0;
 
       function next() {
-        el.classList.add('fade');
+        el.classList.add('exit');
         setTimeout(() => {
           idx = (idx + 1) % events.length;
           el.textContent = events[idx];
-          el.classList.remove('fade');
-        }, 350);
+          el.classList.remove('exit');
+          el.classList.add('enter');
+          requestAnimationFrame(() => requestAnimationFrame(() => el.classList.remove('enter')));
+        }, 420);
       }
 
       setInterval(next, 2200);
